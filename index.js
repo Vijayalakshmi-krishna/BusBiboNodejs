@@ -7,10 +7,10 @@ const mongoClient = require('mongodb');
 const url = "mongodb+srv://admin:passw0rd@mongo-productcatalog-roxs3.mongodb.net/busbookdb?retryWrites=true&w=majority"
 const bcrypt = require('bcrypt');
 const saltrounds = 10;
-
+//const port=3000;
 const port = process.env.PORT;
 
-app.use(cors());
+//app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
