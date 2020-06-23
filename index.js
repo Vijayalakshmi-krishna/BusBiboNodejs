@@ -3,33 +3,17 @@ const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoClient = require('mongodb');
-const url = "mongodb://localhost:27017"
+//const url = "mongodb://localhost:27017"
+const url = "mongodb+srv://admin:passw0rd@mongo-productcatalog-roxs3.mongodb.net/busbookdb?retryWrites=true&w=majority"
 const bcrypt = require('bcrypt');
 const saltrounds = 10;
-// const jwt = require('jsonwebtoken');
+
+const port = process.env.PORT;
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-
-//function to authenticate the user with valid JWT token
-// function authenticate(req, res, next) {
-//     let header = req.header('Authorization')
-
-//     if (header == undefined) {
-//         res.status(401).json({
-//             message: "unauthorized"
-//         });
-//     }
-//     else {
-//         //Allow users with valid token
-//         var decode = jwt.verify(header, 'abcghimno');
-//         next();
-//     }
-
-// }
-//New users Route
 
 app.post("/login", function (req, res) {
     
@@ -198,7 +182,7 @@ app.put('/editSeats/:busNum/:avlSeats', function (req, res) {
     
     var blockedSeats = req.body;
     var bal_seats;
-    // var bookedSeats=blockedSeats.length;
+    
     if (blockedSeats.length == 12) {
         bal_seats = 0
     }
@@ -463,6 +447,6 @@ app.put('/freeseats/:busNum/:freeseats', function (req, res) {
 });
 
 
-app.listen(3000, function () {
-    console.log("Port is running in 3000...")
+app.listen(port, function () {
+    console.log("Port is running in ...",port)
 })
