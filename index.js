@@ -10,19 +10,19 @@ const saltrounds = 10;
 //const port=3000;
 const port = process.env.PORT;
 
-//app.use(cors());
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "https://bus-zone.herokuapp.com");
-    res.header(
-      "Access-Control-Allow-Headers",
-      "Origin, X-Requested-With, Content-Type, Accept"
-    );
-    res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    next();
-  });
+// app.use(function(req, res, next) {
+//     res.header("Access-Control-Allow-Origin", "https://bus-zone.herokuapp.com");
+//     res.header(
+//       "Access-Control-Allow-Headers",
+//       "Origin, X-Requested-With, Content-Type, Accept"
+//     );
+//     res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+//     next();
+//   });
 
 
 app.post("/login", function (req, res) {
