@@ -14,6 +14,7 @@ const port = process.env.PORT;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "https://bus-zone.herokuapp.com");
     res.header(
@@ -23,7 +24,6 @@ app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     next();
   });
-
 
 app.post("/login", function (req, res) {
     
