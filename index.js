@@ -27,7 +27,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.post("/login", function (req, res) {
     
-
+console.log(req.body)
     var loginType =
     {
         $or: [{ email: req.body.email }, { phone: req.body.phone }, { uniqueId: req.body.uniqueId }]
@@ -44,20 +44,11 @@ app.post("/login", function (req, res) {
 
                 if (result) {
 
-                    var type;
-                    if (userData.type == 'P') {
-                        type = "Passenger"
-                    }
-                    else if (userData.type == 'B') {
-                        type = "Bus Operator"
-                    }
-                    else if (userData.type == 'A') {
-                        type = "Admin"
-                    }
+                    
 
                     res.json({
                         result: userData,
-                        message: "successfully Logged in as " + type
+                        message: "successfully Logged in"
                     })
                 }
 
@@ -74,17 +65,16 @@ app.post("/login", function (req, res) {
     })
 })
 
-app.post("/login/register", function (req, res) {
+app.post("/register", function (req, res) {
     
     mongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
         if (err) throw err;
         var db = client.db("busbookdb");
         var minm = 1000;
         var maxm = 9999;
-        var uniqueId = req.body.type + Math.floor(Math.random() * (maxm - minm + 1) + minm);   
+        var uniqueId = 'BZ'+ Math.floor(Math.random() * (maxm - minm + 1) + minm);   
              
-        var newData = {
-            type: req.body.type,
+        var newData = {            
             dob: req.body.dob,
             name: req.body.name,
             email: req.body.email,
@@ -102,8 +92,7 @@ app.post("/login/register", function (req, res) {
 
                 db.collection("users").updateOne(
                     { email: req.body.email }, {
-                    $setOnInsert: {
-                        type: req.body.type,
+                    $setOnInsert: {                        
                         dob: req.body.dob,
                         name: req.body.name,
                         phone: req.body.phone,
@@ -121,7 +110,6 @@ app.post("/login/register", function (req, res) {
                         else {
                             var userData = db.collection("users").findOne({ email: req.body.email });
                             userData.then(function (result) {
-
                                 client.close();
                                 res.json({
                                     Message: "Email Already exists",
@@ -171,7 +159,7 @@ app.post('/searchbuses', function (req, res) {
     mongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
         if (err) throw err;
         var db = client.db("busbookdb");
-        var busresults = db.collection("busData").find({ source: req.body.source, destination: req.body.destination, departDate: req.body.departDate }).toArray();
+        var busresults = db.collection("busData").find({ source: req.body.source, destination: req.body.destination, departDate: req.body.departDate,adminStatus:"Approved"}).toArray();
         busresults.then(function (data) {
             
             client.close();
@@ -257,11 +245,14 @@ app.get('/seatstatus/:busnum', function (req, res) {
 
 app.post('/addbus', function (req, res) {
 
-    
+
+    var busData=req.body;
+    busData.adminStatus='Pending';
+    console.log(busData);
     mongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
         if (err) throw err;
         var db = client.db("busbookdb");
-        db.collection("busData").insertOne((req.body), function (err, result) {
+        db.collection("busData").insertOne((busData), function (err, result) {
             if (err) throw err;           
             client.close();
             res.send({
@@ -455,6 +446,49 @@ app.put('/freeseats/:busNum/:freeseats', function (req, res) {
 
     });
 });
+
+//admin approve bus
+app.put('/approvebus/:busNum', function (req, res) {
+    
+    console.log(req.body.busNum);
+    
+    mongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
+        if (err) throw err;
+        var db = client.db("busbookdb");
+        db.collection("busData").updateOne({ busNum: req.params.busNum },
+            { $set: { adminStatus: "Approved" } }, function (err, result) {
+                if (err) throw err;            
+
+                client.close();
+                res.json({
+                    message: "Approved Bus Data"
+                })
+            });
+
+    });
+});
+
+
+app.put('/rejectbus/:busNum', function (req, res) {
+    
+    console.log(req.body.busNum);
+    
+    mongoClient.connect(url, { useUnifiedTopology: true }, function (err, client) {
+        if (err) throw err;
+        var db = client.db("busbookdb");
+        db.collection("busData").updateOne({ busNum: req.params.busNum },
+            { $set: { adminStatus: "Rejected" } }, function (err, result) {
+                if (err) throw err;            
+
+                client.close();
+                res.json({
+                    message: "Bus Approval Rejected"
+                })
+            });
+
+    });
+});
+
 
 
 app.listen(port, function () {
